@@ -1,0 +1,42 @@
+{
+  "name": "excel-edit",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "tsc &&vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "main": "./dist/excel-edit.umd.cjs",
+  "module": "./dist/excel-edit.js",
+  "exports": {
+    ".": {
+      "import": "./dist/excel-edit.js",
+      "require": "./dist/excel-edit.umd.cjs"
+    },
+    "./webav": {
+      "import": "./dist/excel-edit.js",
+      "require": "./dist/excel-edit.umd.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/fabric": "^5.3.2",
+    "@types/lodash-es": "^4.17.7",
+    "@vue/test-utils": "^2.3.2",
+    "jsdom": "^22.0.0",
+    "vite": "^4.3.2",
+    "vite-plugin-windicss": "^1.8.10",
+    "vitest": "^0.30.1",
+    "windicss": "^3.5.6"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.7",
+    "fabric": "^5.3.0",
+    "lodash-es": "^4.17.21"
+  }
+}
