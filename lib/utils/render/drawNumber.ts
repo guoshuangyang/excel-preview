@@ -8,6 +8,8 @@ import {
   defaultLeftNumberWidth,
   defaultCellBorderColor,
   defaultCellFontColor,
+  defaultThemeColor,
+  defaultActiveBackgroundColor,
 } from "~/utils/constant";
 import { generateRowIndex } from "~/utils/generate/string";
 import { calcViewport } from "../calc";
@@ -16,7 +18,7 @@ const renderTopNumber = (element: RowType, index: number, top: number = 0) => {
   const rect = new fabric.Rect({
     width: element.width,
     height: defaultTopNumberHeight,
-    fill: defaultTopNumberFill,
+    fill: element.headerColor || defaultTopNumberFill,
     strokeWidth: 0,
     stroke: defaultCellBorderColor,
     selectable: false,
@@ -31,15 +33,32 @@ const renderTopNumber = (element: RowType, index: number, top: number = 0) => {
     fill: defaultCellFontColor,
     originX: "center",
     originY: "center",
-    top: 0,
-    left: 0,
   });
-  const group = new fabric.Group([rect, text], {
+  let group = new fabric.Group([rect, text], {
     left: element.x,
     top: top,
     selectable: false,
     evented: false,
   });
+  if (element.headerColor && element.headerColor !== defaultTopNumberFill) {
+    // 新增一条线
+    const line = new fabric.Line(
+      [
+        element.x,
+        defaultTopNumberHeight,
+        element.x + element.width,
+        defaultTopNumberHeight,
+      ],
+      {
+        stroke: defaultThemeColor,
+        strokeWidth: 2,
+        selectable: false,
+        evented: false,
+      }
+    );
+    group.addWithUpdate(line);
+  }
+
   return group;
 };
 
@@ -49,6 +68,8 @@ export class DrawTopMenu {
   private groups: fabric.Group[] = [];
   private tmpGroups: fabric.Group[] = [];
   private tmpRows: RowType[] = [];
+  private activeRowIndexStart: number = -1;
+  private activeRowIndexEnd: number = -1;
 
   constructor(canvas: fabric.Canvas, options: optionsType) {
     this.canvas = canvas;
@@ -73,10 +94,6 @@ export class DrawTopMenu {
     for (let i = 0; i < this.options.rows.length; i++) {
       const element = this.options.rows[i];
       const group = renderTopNumber(element, i, tl.y);
-      // 添加事件，鼠标移入，鼠标显示状态
-      group.on("mouseover", () => {
-        this.canvas.defaultCursor = "pointer";
-      });
       this.groups.push(group);
       this.canvas.add(group);
       this.canvas.bringToFront(group);
@@ -93,6 +110,24 @@ export class DrawTopMenu {
   setTopZero() {
     this.renderGroups();
     this.addTemp(this.tmpRows);
+  }
+
+  setActiveRowIndex(start: number, end?: number) {
+    if (!end) {
+      end = start;
+    }
+    if (this.activeRowIndexStart !== -1 || this.activeRowIndexEnd !== -1) {
+      for (let i = this.activeRowIndexStart; i <= this.activeRowIndexEnd; i++) {
+        console.log("object");
+        delete this.options.rows[i].headerColor;
+      }
+    }
+    this.activeRowIndexStart = start;
+    this.activeRowIndexEnd = end;
+    for (let i = start; i <= end; i++) {
+      this.options.rows[i].headerColor = defaultActiveBackgroundColor;
+    }
+    this.renderGroups();
   }
 
   // 新增临时的部分
@@ -123,32 +158,47 @@ const renderLeftNumber = (
   const rect = new fabric.Rect({
     width: defaultLeftNumberWidth,
     height: element.height,
-    fill: defaultTopNumberFill,
+    fill: element.headerColor || defaultTopNumberFill,
     // 边框的颜色和宽度
     strokeWidth: 0,
     stroke: defaultCellBorderColor,
     selectable: false,
+    originX: "center",
+    originY: "center",
+    top: 0,
+    left: 0,
   });
   const text = new fabric.Text(index + 1 + "", {
     fontSize: defaultFontSize,
     fontFamily: defaultFontFamily,
     fill: defaultCellFontColor,
+    originX: "center",
+    originY: "center",
   });
   const group = new fabric.Group([rect, text], {
-    left: 0,
     top: element.y,
     selectable: false,
     evented: false,
+    left: left,
   });
-  group.item(1).set({
-    originX: "center",
-    originY: "center",
-    left: 0,
-    top: 0,
-  });
-  group.set({
-    left,
-  });
+  if (element.headerColor && element.headerColor !== defaultTopNumberFill) {
+    // 新增一条线
+    const line = new fabric.Line(
+      [
+        defaultLeftNumberWidth,
+        element.y,
+        defaultLeftNumberWidth,
+        element.y + element.height,
+      ],
+      {
+        stroke: defaultThemeColor,
+        strokeWidth: 2,
+        selectable: false,
+        evented: false,
+      }
+    );
+    group.addWithUpdate(line);
+  }
   return group;
 };
 
@@ -158,6 +208,8 @@ export class DrawLeftNumber {
   private groups: fabric.Group[] = [];
   private tmpGroups: fabric.Group[] = [];
   private tmpCols: ColType[] = [];
+  private activeColIndexStart: number = -1;
+  private activeColIndexEnd: number = -1;
 
   constructor(canvas: fabric.Canvas, options: optionsType) {
     this.canvas = canvas;
@@ -185,6 +237,24 @@ export class DrawLeftNumber {
       this.canvas.add(group);
       this.canvas.bringToFront(group);
     }
+  }
+
+  setActiveColIndex(start: number, end?: number) {
+    if (!end) {
+      end = start;
+    }
+    if (this.activeColIndexStart !== -1 || this.activeColIndexEnd !== -1) {
+      console.log("存在", this.activeColIndexStart, this.activeColIndexEnd);
+      for (let i = this.activeColIndexStart; i <= this.activeColIndexEnd; i++) {
+        delete this.options.cols[i].headerColor;
+      }
+    }
+    this.activeColIndexStart = start;
+    this.activeColIndexEnd = end;
+    for (let i = this.activeColIndexStart; i <= this.activeColIndexEnd; i++) {
+      this.options.cols[i].headerColor = defaultActiveBackgroundColor;
+    }
+    this.renderGroups();
   }
 
   // 新增真实的数据

@@ -4,6 +4,7 @@ import type { CallbackArgsType, eventNameType } from "~/@types/event/index";
 import bindAllEvents from "~/utils/events/index";
 import publicSubscribe from "~/utils/events/publicSubscribe";
 import {
+  defaultActiveBackgroundColor,
   defaultCellBackgroundColor,
   defaultCellBorderWidth,
   defaultLeftNumberWidth,
@@ -54,24 +55,15 @@ export const useExcel = (id: Container, options: ExcelData) => {
   publicSubscribe.on("mouseDown", (args) => {
     const pointer = args.event.pointer;
     if (!pointer) return;
-    // 判断点击时是不是菜单头
-    if (
-      pointer.x <= defaultLeftNumberWidth ||
-      pointer.y <= defaultTopNumberHeight
-    ) {
-      // ToDo 点击了菜单头
-      // console.log(
-      //   pointer.x <= defaultLeftNumberWidth,
-      //   pointer.y <= defaultTopNumberHeight
-      // );
-      return;
-    }
+
     const { row, col } = args;
     if (row < 0 || col < 0) {
       // 点击的是行头或者列头
-      console.log(row, col);
+      // console.log(row, col);
       return;
     }
+    topNumber.setActiveRowIndex(row);
+    leftNumber.setActiveColIndex(col);
     let tlX = options.rows[row].x;
     let tlY = options.cols[col].y;
     let brX =
@@ -165,7 +157,7 @@ export const useExcel = (id: Container, options: ExcelData) => {
       return;
     } else {
       // 鼠标在表格中
-      console.log("在表格中");
+      // console.log("在表格中");
       // 设置成默认的十字空心
       canvas.defaultCursor = "cell";
     }

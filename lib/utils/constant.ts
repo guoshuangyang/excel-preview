@@ -1,3 +1,4 @@
+import Color from "color";
 // 正则
 export const httpsReg = /^https:\/\//;
 
@@ -24,5 +25,8 @@ export const defaultThemeColor = "#22ba7c"; // 主题颜色
 export const defaultCellBorderColor = "#d8dade"; // 边框颜色
 export const defaultCellBackgroundColor = "#fff"; // 单元格背景颜色
 export const defaultCellFontColor = "#000"; // 单元格字体颜色
-export const defaultTopNumberFill = "#f1f3f6"; // 顶部数字栏目的背景颜色
+export const defaultTopNumberFill = "#f1f3f6"; // 数字栏目的背景颜色
 export const defaultActiveNumberColor = "#efefef"; // 选中的数字颜色
+export const defaultActiveBackgroundColor = Color("#22ba7c")
+  .alpha(0.2)
+  .string();

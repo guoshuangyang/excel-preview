@@ -11,6 +11,7 @@ export declare type RowType = {
   // 左上角的x坐标
   x: number;
   index: number;
+  headerColor?: string;
   font?: Font;
 };
 
@@ -20,6 +21,7 @@ export declare type ColType = {
   // 左上角的y坐标
   y: number;
   index: number;
+  headerColor?: string;
   font?: Font;
 };
 
