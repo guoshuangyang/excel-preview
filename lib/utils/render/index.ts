@@ -4,14 +4,11 @@ import type { CallbackArgsType, eventNameType } from "~/@types/event/index";
 import bindAllEvents from "~/utils/events/index";
 import publicSubscribe from "~/utils/events/publicSubscribe";
 import {
-  defaultActiveBackgroundColor,
   defaultCellBackgroundColor,
-  defaultCellBorderWidth,
-  defaultLeftNumberWidth,
+  defaultBorderWidth,
   defaultSelectBorderWidth,
   defaultSelectedRBWidth,
   defaultThemeColor,
-  defaultTopNumberHeight,
 } from "~/utils/constant";
 import { throttle } from "lodash-es";
 import { Container, ExcelData } from "~/@types";
@@ -28,6 +25,7 @@ export const useExcel = (id: Container, options: ExcelData) => {
     throw new Error("el is not found");
   }
   const { offsetWidth, offsetHeight } = canvasBox;
+
   // 创建一个canvas
   let paper = document.createDocumentFragment();
   let canvasDom = document.createElement("canvas");
@@ -67,9 +65,9 @@ export const useExcel = (id: Container, options: ExcelData) => {
     let tlX = options.rows[row].x;
     let tlY = options.cols[col].y;
     let brX =
-      options.rows[row].x + options.rows[row].width + defaultCellBorderWidth;
+      options.rows[row].x + options.rows[row].width + defaultBorderWidth;
     let brY =
-      options.cols[col].y + options.cols[col].height + defaultCellBorderWidth;
+      options.cols[col].y + options.cols[col].height + defaultBorderWidth;
     const renderFn = () => {
       // 2. 绘制选中框 矩形
       let rect = new fabric.Rect({
@@ -83,22 +81,6 @@ export const useExcel = (id: Container, options: ExcelData) => {
         selectable: false,
         evented: false,
       });
-      // let tl = new fabric.Line([tlX, tlY, brX, tlY], {
-      //   stroke: defaultThemeColor,
-      //   strokeWidth: defaultSelectBorderWidth,
-      // });
-      // let tr = new fabric.Line([tlX, tlY, tlX, brY], {
-      //   stroke: defaultThemeColor,
-      //   strokeWidth: defaultSelectBorderWidth,
-      // });
-      // let bl = new fabric.Line([tlX, brY, brX, brY], {
-      //   stroke: defaultThemeColor,
-      //   strokeWidth: defaultSelectBorderWidth,
-      // });
-      // let br = new fabric.Line([brX, tlY, brX, brY], {
-      //   stroke: defaultThemeColor,
-      //   strokeWidth: defaultSelectBorderWidth,
-      // });
       let btn = new fabric.Rect({
         left: brX - defaultSelectedRBWidth / 2,
         top: brY - defaultSelectedRBWidth / 2,
@@ -116,7 +98,6 @@ export const useExcel = (id: Container, options: ExcelData) => {
         evented: false,
       });
       canvas.add(selectBorder);
-      canvas.bringToFront(selectBorder);
     };
     if (selectBorder) {
       canvas.remove(selectBorder);
@@ -163,6 +144,15 @@ export const useExcel = (id: Container, options: ExcelData) => {
     }
   });
 
+  // 监听canvas的resize事件
+  const resizeHandler = throttle(() => {
+    canvas.setWidth(canvasBox.offsetWidth);
+    canvas.setHeight(canvasBox.offsetHeight);
+    canvas.renderAll();
+  }, 1000 / 60);
+  let resizeObserver = new ResizeObserver(resizeHandler);
+  resizeObserver.observe(canvasBox);
+
   // 暴露出来一下方法
   return {
     subscribe: (
@@ -178,6 +168,13 @@ export const useExcel = (id: Container, options: ExcelData) => {
     ) => {
       // 取消订阅事件
       publicSubscribe.off(eventName, callback);
+    },
+    resize: resizeHandler,
+    destroy: () => {
+      // 销毁
+      canvas.dispose();
+      canvasBox.removeChild(canvasDom);
+      resizeObserver.disconnect();
     },
   };
 };

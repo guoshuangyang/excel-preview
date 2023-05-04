@@ -1,7 +1,7 @@
 import { fabric } from "fabric";
 import { optionsType } from "~/@types/data";
 import {
-  defaultCellBorderWidth,
+  defaultBorderWidth,
   defaultCellBorderColor,
   defaultLeftNumberWidth,
   defaultTopNumberHeight,
@@ -19,17 +19,18 @@ function drawLineByData(canvas: fabric.Canvas, options: optionsType) {
   let rowLines: fabric.Line[] = [];
   let colLines: fabric.Line[] = [];
   let colsHeight = options.cols.reduce((total, col) => {
-    return total + col.height + defaultCellBorderWidth;
+    return total + col.height + defaultBorderWidth;
   }, defaultTopNumberHeight);
 
   let xLength = defaultLeftNumberWidth;
   for (let i = 0; i <= options.rows.length; i++) {
     const rowLine = new fabric.Line([xLength, 0, xLength, colsHeight], {
       stroke: defaultCellBorderColor,
-      strokeWidth: defaultCellBorderWidth,
+      strokeWidth: defaultBorderWidth,
       selectable: false,
       evented: false,
     });
+    rowLine.sendToBack();
     canvas.add(rowLine);
     rowLines.push(rowLine);
     if (i === options.rows.length) {
@@ -37,16 +38,18 @@ function drawLineByData(canvas: fabric.Canvas, options: optionsType) {
     }
     // 为options.rows添加x和y属性
     options.rows[i].x = xLength;
-    xLength += options.rows[i]?.width + defaultCellBorderWidth;
+    xLength += options.rows[i]?.width + defaultBorderWidth;
   }
   let yLength = defaultTopNumberHeight;
   for (let i = 0; i <= options.cols.length; i++) {
     const colLine = new fabric.Line([0, yLength, xLength, yLength], {
       stroke: defaultCellBorderColor,
-      strokeWidth: defaultCellBorderWidth,
+      strokeWidth: defaultBorderWidth,
       selectable: false,
       evented: false,
     });
+    // 放在最最底下
+    colLine.sendToBack();
     canvas.add(colLine);
     colLines.push(colLine);
     if (i === options.cols.length) {
@@ -54,7 +57,7 @@ function drawLineByData(canvas: fabric.Canvas, options: optionsType) {
     }
     // 为options.cols添加x和y属性
     options.cols[i].y = yLength;
-    yLength += options.cols[i]?.height + defaultCellBorderWidth;
+    yLength += options.cols[i]?.height + defaultBorderWidth;
   }
 
   // 恢复渲染

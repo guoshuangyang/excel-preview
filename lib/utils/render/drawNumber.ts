@@ -45,110 +45,24 @@ const renderTopNumber = (element: RowType, index: number, top: number = 0) => {
     const line = new fabric.Line(
       [
         element.x,
-        defaultTopNumberHeight,
+        defaultTopNumberHeight + top,
         element.x + element.width,
-        defaultTopNumberHeight,
+        defaultTopNumberHeight + top,
       ],
       {
         stroke: defaultThemeColor,
         strokeWidth: 2,
         selectable: false,
         evented: false,
+        originX: "center",
+        originY: "center",
       }
     );
     group.addWithUpdate(line);
   }
-
+  group.bringToFront();
   return group;
 };
-
-export class DrawTopMenu {
-  public canvas: fabric.Canvas;
-  public options: optionsType;
-  private groups: fabric.Group[] = [];
-  private tmpGroups: fabric.Group[] = [];
-  private tmpRows: RowType[] = [];
-  private activeRowIndexStart: number = -1;
-  private activeRowIndexEnd: number = -1;
-
-  constructor(canvas: fabric.Canvas, options: optionsType) {
-    this.canvas = canvas;
-    this.options = options;
-    this.groups = [];
-    this.tmpGroups = [];
-    this.tmpRows = [];
-    this.renderGroups();
-  }
-
-  // 渲染顶部的A-Z...
-  renderGroups() {
-    // 先移除所有的，再重新渲染
-    if (this.groups) {
-      this.groups.forEach((item) => {
-        this.canvas.remove(item);
-      });
-      this.groups = [];
-    }
-    const { tl } = calcViewport(this.canvas);
-    // 根据optionsType中的rows渲染
-    for (let i = 0; i < this.options.rows.length; i++) {
-      const element = this.options.rows[i];
-      const group = renderTopNumber(element, i, tl.y);
-      this.groups.push(group);
-      this.canvas.add(group);
-      this.canvas.bringToFront(group);
-    }
-  }
-
-  // 新增真实的数据
-  addGroups(rows: RowType[]) {
-    this.options.rows = [...this.options.rows, ...rows];
-    this.renderGroups();
-  }
-
-  // 将所有的都移动在canvas的top为零的位置
-  setTopZero() {
-    this.renderGroups();
-    this.addTemp(this.tmpRows);
-  }
-
-  setActiveRowIndex(start: number, end?: number) {
-    if (!end) {
-      end = start;
-    }
-    if (this.activeRowIndexStart !== -1 || this.activeRowIndexEnd !== -1) {
-      for (let i = this.activeRowIndexStart; i <= this.activeRowIndexEnd; i++) {
-        console.log("object");
-        delete this.options.rows[i].headerColor;
-      }
-    }
-    this.activeRowIndexStart = start;
-    this.activeRowIndexEnd = end;
-    for (let i = start; i <= end; i++) {
-      this.options.rows[i].headerColor = defaultActiveBackgroundColor;
-    }
-    this.renderGroups();
-  }
-
-  // 新增临时的部分
-  addTemp(rows: RowType[]) {
-    this.tmpRows = rows;
-    // 清楚临时的部分
-    this.tmpGroups.forEach((group) => {
-      this.canvas.remove(group);
-    });
-    this.tmpGroups = [];
-    let { tl } = calcViewport(this.canvas);
-    // 渲染顶部的A-Z...
-    for (let j = 0; j < rows.length; j++) {
-      const element = rows[j];
-      const group = renderTopNumber(element, j, tl.y);
-      this.tmpGroups.push(group);
-      this.canvas.add(group);
-      this.canvas.bringToFront(group);
-    }
-  }
-}
 
 const renderLeftNumber = (
   element: ColType,
@@ -185,9 +99,9 @@ const renderLeftNumber = (
     // 新增一条线
     const line = new fabric.Line(
       [
-        defaultLeftNumberWidth,
+        defaultLeftNumberWidth + left,
         element.y,
-        defaultLeftNumberWidth,
+        defaultLeftNumberWidth + left,
         element.y + element.height,
       ],
       {
@@ -202,12 +116,74 @@ const renderLeftNumber = (
   return group;
 };
 
+export class DrawTopMenu {
+  public canvas: fabric.Canvas;
+  public options: optionsType;
+  private groups: fabric.Group[] = [];
+  private activeRowIndexStart: number = -1;
+  private activeRowIndexEnd: number = -1;
+
+  constructor(canvas: fabric.Canvas, options: optionsType) {
+    this.canvas = canvas;
+    this.options = options;
+    this.groups = [];
+    this.renderGroups();
+  }
+
+  // 渲染顶部的A-Z...
+  renderGroups() {
+    // 先移除所有的，再重新渲染
+    if (this.groups) {
+      this.groups.forEach((item) => {
+        this.canvas.remove(item);
+      });
+      this.groups = [];
+    }
+    const { tl } = calcViewport(this.canvas);
+    // 根据optionsType中的rows渲染
+    for (let i = 0; i < this.options.rows.length; i++) {
+      const element = this.options.rows[i];
+      const group = renderTopNumber(element, i, tl.y);
+      this.groups.push(group);
+      this.canvas.add(group);
+      this.canvas.bringToFront(group);
+    }
+  }
+
+  // 新增真实的数据
+  addGroups(rows: RowType[]) {
+    this.options.rows = [...this.options.rows, ...rows];
+    this.renderGroups();
+  }
+
+  // 将所有的都移动在canvas的top为零的位置
+  setTopZero() {
+    this.renderGroups();
+  }
+
+  setActiveRowIndex(start: number, end?: number) {
+    if (!end) {
+      end = start;
+    }
+    if (this.activeRowIndexStart !== -1 || this.activeRowIndexEnd !== -1) {
+      for (let i = this.activeRowIndexStart; i <= this.activeRowIndexEnd; i++) {
+        console.log("object");
+        delete this.options.rows[i].headerColor;
+      }
+    }
+    this.activeRowIndexStart = start;
+    this.activeRowIndexEnd = end;
+    for (let i = start; i <= end; i++) {
+      this.options.rows[i].headerColor = defaultActiveBackgroundColor;
+    }
+    this.renderGroups();
+  }
+}
+
 export class DrawLeftNumber {
   public canvas: fabric.Canvas;
   public options: optionsType;
   private groups: fabric.Group[] = [];
-  private tmpGroups: fabric.Group[] = [];
-  private tmpCols: ColType[] = [];
   private activeColIndexStart: number = -1;
   private activeColIndexEnd: number = -1;
 
@@ -215,8 +191,6 @@ export class DrawLeftNumber {
     this.canvas = canvas;
     this.options = options;
     this.groups = [];
-    this.tmpGroups = [];
-    this.tmpCols = [];
     this.renderGroups();
   }
 
@@ -244,7 +218,6 @@ export class DrawLeftNumber {
       end = start;
     }
     if (this.activeColIndexStart !== -1 || this.activeColIndexEnd !== -1) {
-      console.log("存在", this.activeColIndexStart, this.activeColIndexEnd);
       for (let i = this.activeColIndexStart; i <= this.activeColIndexEnd; i++) {
         delete this.options.cols[i].headerColor;
       }
@@ -266,26 +239,6 @@ export class DrawLeftNumber {
   // 将所有的都移动在canvas的left为零的位置
   setLeftZero() {
     this.renderGroups();
-    this.addTemp(this.tmpCols);
-  }
-
-  // 新增临时的部分
-  addTemp(cols: ColType[]) {
-    this.tmpCols = cols;
-    // 清楚临时的部分
-    this.tmpGroups.forEach((group) => {
-      this.canvas.remove(group);
-    });
-    this.tmpGroups = [];
-    let { tl } = calcViewport(this.canvas);
-    // 渲染顶部的A-Z...
-    for (let j = 0; j < cols.length; j++) {
-      const element = cols[j];
-      const group = renderLeftNumber(element, j, tl.x);
-      this.tmpGroups.push(group);
-      this.canvas.add(group);
-      this.canvas.bringToFront(group);
-    }
   }
 }
 

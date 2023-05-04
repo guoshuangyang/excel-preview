@@ -1,7 +1,7 @@
 import { ColType, RowType, optionsType } from "~/@types/data";
 import {
   defaultCellBorderColor,
-  defaultCellBorderWidth,
+  defaultBorderWidth,
   defaultCellHeight,
   defaultCellWidth,
   defaultExcelRightBottomDistance,
@@ -22,7 +22,7 @@ export const calcWhichCell = (
     row = -1;
   } else {
     for (let i = 0; i < options.rows.length; i++) {
-      xLength += options.rows[i].width + defaultCellBorderWidth;
+      xLength += options.rows[i].width + defaultBorderWidth;
       row = i + 1;
       if (pointer.x < xLength) {
         row = i;
@@ -34,7 +34,7 @@ export const calcWhichCell = (
     col = -1;
   } else {
     for (let i = 0; i < options.cols.length; i++) {
-      yLength += options.cols[i].height + defaultCellBorderWidth;
+      yLength += options.cols[i].height + defaultBorderWidth;
       col = i + 1;
       if (pointer.y < yLength) {
         col = i;
@@ -61,8 +61,8 @@ export const calcRxAndBy = (
   const lasterRow = rows[rows.length - 1];
   const lasterCol = cols[cols.length - 1];
   return {
-    rx: lasterRow.x + lasterRow.width + defaultCellBorderWidth,
-    by: lasterCol.y + lasterCol.height + defaultCellBorderWidth,
+    rx: lasterRow.x + lasterRow.width + defaultBorderWidth,
+    by: lasterCol.y + lasterCol.height + defaultBorderWidth,
     xLasterIndex: rows.length - 1,
     yLasterIndex: cols.length - 1,
   };
@@ -99,13 +99,13 @@ export const calcTempRowsAndCols = (
   if (tl.x > rx + width * 1.1) {
     // 获取最左侧边界的靠近的单元格的index和x坐标
     const num = Math.ceil(
-      (tl.x - rx) / (defaultCellWidth + defaultCellBorderWidth)
+      (tl.x - rx) / (defaultCellWidth + defaultBorderWidth)
     );
     const xIndex = xLasterIndex + num;
     // 左侧应该渲染多少个临时的rows
     const firstX =
       (xIndex - Math.ceil(num - xNumber / 4) - xLasterIndex) *
-      (defaultCellWidth + defaultCellBorderWidth);
+      (defaultCellWidth + defaultBorderWidth);
     const firstIndex = xIndex - Math.ceil(num - xNumber / 4);
     // 计算临时的rows
     for (let i = 0; i < xNumber; i++) {
@@ -130,13 +130,13 @@ export const calcTempRowsAndCols = (
   if (tl.y > by + height * 1.1) {
     // 获取最上侧边界的靠近的单元格的index和y坐标
     const num = Math.ceil(
-      (tl.y - by) / (defaultCellHeight + defaultCellBorderWidth)
+      (tl.y - by) / (defaultCellHeight + defaultBorderWidth)
     );
     const yIndex = yLasterIndex + num;
     // 上侧应该渲染多少个临时的cols
     const firstY =
       (yIndex - Math.ceil(num - yNumber / 4) - yLasterIndex) *
-      (defaultCellHeight + defaultCellBorderWidth);
+      (defaultCellHeight + defaultBorderWidth);
     const firstIndex = yIndex - Math.ceil(num - yNumber / 4);
     // 计算临时的cols
     for (let i = 0; i < yNumber; i++) {
