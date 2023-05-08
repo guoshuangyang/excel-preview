@@ -16,7 +16,7 @@
       "import": "./dist/excel-edit.js",
       "require": "./dist/excel-edit.umd.cjs"
     },
-    "./webav": {
+    "./excel-edit": {
       "import": "./dist/excel-edit.js",
       "require": "./dist/excel-edit.umd.cjs"
     }

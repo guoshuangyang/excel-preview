@@ -11,7 +11,7 @@ import {
   defaultThemeColor,
 } from "~/utils/constant";
 import { throttle } from "lodash-es";
-import { Container, ExcelData } from "~/@types";
+import { Container, ExcelData } from "~/@types/index";
 
 export const useExcel = (id: Container, options: ExcelData) => {
   let canvas: fabric.Canvas;
