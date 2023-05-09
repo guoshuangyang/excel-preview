@@ -178,6 +178,17 @@ export class DrawTopMenu {
     }
     this.renderGroups();
   }
+
+  clearActiveRowIndex() {
+    if (this.activeRowIndexStart !== -1 || this.activeRowIndexEnd !== -1) {
+      for (let i = this.activeRowIndexStart; i <= this.activeRowIndexEnd; i++) {
+        delete this.options.rows[i].headerColor;
+      }
+    }
+    this.activeRowIndexStart = -1;
+    this.activeRowIndexEnd = -1;
+    this.renderGroups();
+  }
 }
 
 export class DrawLeftNumber {
@@ -238,6 +249,17 @@ export class DrawLeftNumber {
 
   // 将所有的都移动在canvas的left为零的位置
   setLeftZero() {
+    this.renderGroups();
+  }
+
+  clearActiveColIndex() {
+    if (this.activeColIndexStart !== -1 || this.activeColIndexEnd !== -1) {
+      for (let i = this.activeColIndexStart; i <= this.activeColIndexEnd; i++) {
+        delete this.options.cols[i].headerColor;
+      }
+    }
+    this.activeColIndexStart = -1;
+    this.activeColIndexEnd = -1;
     this.renderGroups();
   }
 }

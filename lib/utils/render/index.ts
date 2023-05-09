@@ -51,10 +51,20 @@ export const useExcel = (id: Container, options: ExcelData) => {
   bindAllEvents(canvas, rowAndCol);
   let selectBorder: fabric.Group;
   publicSubscribe.on("mouseDown", (args) => {
+    console.log(args);
     const pointer = args.event.pointer;
     if (!pointer) return;
 
     const { row, col } = args;
+    if (row < -1 || col < -1) {
+      // 其他错误 点击的空白地方
+      topNumber.clearActiveRowIndex();
+      leftNumber.clearActiveColIndex();
+      if (selectBorder) {
+        canvas.remove(selectBorder);
+      }
+      return;
+    }
     if (row < 0 || col < 0) {
       // 点击的是行头或者列头
       // console.log(row, col);

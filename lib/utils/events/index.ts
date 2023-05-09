@@ -30,7 +30,31 @@ const mouseOverEventCallback = throttle(
 // 监听鼠标的点击事件 - 用于计算鼠标的位置 并做节流处理
 const mouseDownEventCallback = throttle(
   (event: fabric.IEvent, options: optionsType) => {
-    const params = calcWhichCellByMousePosition(event, options);
+    // todo 判断点击是不是空白地方
+    let laterRow = options.rows[options.rows.length - 1];
+    let laterCol = options.cols[options.cols.length - 1];
+    let params;
+    if (!event.absolutePointer) {
+      params = {
+        row: -999,
+        col: -999,
+        event,
+      };
+      // return;
+    } else {
+      if (
+        laterRow.x + laterRow.width < event.absolutePointer.x ||
+        laterCol.y + laterCol.height < event.absolutePointer.y
+      ) {
+        params = {
+          row: -999,
+          col: -999,
+          event,
+        };
+      } else {
+        params = calcWhichCellByMousePosition(event, options);
+      }
+    }
     params && publicSubscribe.emit("mouseDown", params);
   },
   1000 / 21
